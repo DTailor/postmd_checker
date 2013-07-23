@@ -20,7 +20,7 @@ class Yodler(object):
 			open(self.file_dir, 'w').close()
 
 	def get_codes(self):
-		codes = [line.strip() for line in open(self.file_dir)]
+		codes = [line.strip().split('~') for line in open(self.file_dir)]
 		return codes
 
 	def remove_code(self, code):
@@ -50,24 +50,26 @@ class PostaParser(object):
 	def get_info(self):
 		self.table = PrettyTable(["Data si ora locala", "Tara", "Localitatea", "Evenimentul", "Informatie aditionala"])
 		self.get_soup()
-		rows = self.soup.find('tbody').find_all('tr')
+		try:
+			rows = self.soup.find('tbody').find_all('tr')
 
-		for row in rows[3:]:
-			cells = row.find_all("td")
-			self.date_time = cells[0].get_text()
-			self.country = cells[1].get_text()
-			self.city = cells[2].get_text()
-			self.event = cells[3].get_text()
-			self.additional_info = cells[4].get_text()
-			self.table.add_row([self.date_time, self.country, self.city, self.event, self.additional_info])
-		print self.table
-
-	def print_data(self):
-		pass
+			for row in rows[3:]:
+				cells = row.find_all("td")
+				self.date_time = cells[0].get_text()
+				self.country = cells[1].get_text()
+				self.city = cells[2].get_text()
+				self.event = cells[3].get_text()
+				self.additional_info = cells[4].get_text()
+				self.table.add_row([self.date_time, self.country, self.city, self.event, self.additional_info])
+				print self.table
+		except:
+			print 'No data available'
 
 		
 if __name__ == '__main__':
 	codes = Yodler().get_codes()
 
-	for code in codes:
+	for code, name in codes:
+		print  name, code
 		PostaParser(code).get_info()
+		print "\n\n\n"
